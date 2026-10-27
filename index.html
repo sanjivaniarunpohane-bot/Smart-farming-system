@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07111f">
+<title>N.A.P SMART FARMING RC</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#07111f;
+  color:#eafaff;
+}
+header{
+  text-align:center;
+  padding:22px 12px;
+  background:linear-gradient(135deg,#102b49,#07111f);
+  border-bottom:1px solid #00d9ff;
+}
+h1{font-size:23px;margin:0;color:#00e5ff}
+header p{font-size:12px;color:#9bbbd0}
+.status{
+  display:inline-block;
+  padding:7px 12px;
+  border:1px solid #00e5ff;
+  border-radius:20px;
+  color:#00e5ff;
+  font-size:12px;
+}
+main{max-width:650px;margin:auto;padding:14px}
+.panel{
+  background:#0d1c2e;
+  border:1px solid #1b3d58;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:15px;
+}
+h2{font-size:17px;margin:0 0 14px;color:#00e5ff}
+button{
+  background:#132c43;
+  color:white;
+  border:1px solid #315570;
+  border-radius:12px;
+  min-height:54px;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+  touch-action:manipulation;
+  user-select:none;
+}
+button:active{background:#007f9d}
+button:focus-visible{outline:2px solid #00e5ff}
+.drive{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+.stop{background:#7b2030;border-color:#ff5367}
+.action-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
+}
+.action-grid button{font-size:14px}
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:10px 0;
+}
+.row button{min-width:100px;min-height:44px;font-size:14px}
+.small{font-size:12px;color:#a6c0d2;line-height:1.5}
+#log{
+  background:#050b13;
+  color:#9df7ff;
+  padding:12px;
+  border-radius:9px;
+  min-height:90px;
+  max-height:180px;
+  overflow:auto;
+  font:12px monospace;
+  white-space:pre-wrap;
+}
+input[type=range]{width:100%;accent-color:#00e5ff}
+footer{text-align:center;padding:10px 16px 25px}
+.wide{width:100%;margin:5px 0}
+button:disabled{opacity:.5}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>N.A.P SMART FARMING RC</h1>
+  <p>SMART FARMING ROBOT CONTROL PANEL</p>
+  <span class="status" id="status">BROWSER DEMO MODE</span>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Connection</h2>
+    <p class="small">
+      This is a browser UI test. Chrome on Android cannot directly
+      communicate with an HC-05 Bluetooth Classic serial module using
+      this page. These buttons only display test commands.
+    </p>
+    <button class="wide" id="demoBtn">START BROWSER DEMO</button>
+  </section>
+
+  <section class="panel">
+    <h2>Vehicle Direction</h2>
+    <div class="drive">
+      <button data-drive="Q">↖</button>
+      <button data-drive="F">▲<br>Forward</button>
+      <button data-drive="E">↗</button>
+
+      <button data-drive="L">◀ Left</button>
+      <button class="stop" id="stopBtn">■ STOP</button>
+      <button data-drive="R">Right ▶</button>
+
+      <button data-drive="Z">↙</button>
+      <button data-drive="B">▼<br>Backward</button>
+      <button data-drive="C">↘</button>
+    </div>
+    <p class="small">Hold a direction button to preview a command; releasing it sends STOP in the demo log.</p>
+    <div class="row">
+      <label for="speed">Speed preview</label>
+      <strong id="speedValue">60%</strong>
+    </div>
+    <input id="speed" type="range" min="0" max="100" value="60">
+    <p class="small">The speed slider is a visual demo only.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Farming Controls</h2>
+    <div class="action-grid">
+      <button data-command="P">SPRAY PUMP ON · P</button>
+      <button data-command="p">SPRAY PUMP OFF · p</button>
+      <button data-command="N">SEED DISPENSER ON · N</button>
+      <button data-command="n">SEED DISPENSER OFF · n</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Lights & Horn</h2>
+    <div class="action-grid">
+      <button data-command="W">FRONT LIGHTS ON · W</button>
+      <button data-command="w">FRONT LIGHTS OFF · w</button>
+      <button data-command="U">REAR LIGHTS ON · U</button>
+      <button data-command="u">REAR LIGHTS OFF · u</button>
+      <button data-command="V">HORN ON · V</button>
+      <button data-command="v">HORN OFF · v</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Command Monitor</h2>
+    <div id="log">Ready. Start the browser demo to test the interface.</div>
+    <button class="wide" id="clearBtn">CLEAR LOG</button>
+  </section>
+
+  <section class="panel">
+    <h2>Command Map</h2>
+    <p class="small">
+      F = Forward · B = Backward · L = Left · R = Right · S = Stop<br>
+      Q = Forward-left · E = Forward-right<br>
+      Z = Back-left · C = Back-right<br>
+      P/p = Spray ON/OFF · N/n = Seed ON/OFF<br>
+      W/w = Front lights · U/u = Rear lights · V/v = Horn
+    </p>
+    <p class="small">
+      IMPORTANT: Your Arduino program must use the same command map.
+      The original G/g seed commands were changed to N/n because G
+      conflicts with forward-left in the original mapping.
+    </p>
+  </section>
+</main>
+
+<footer class="small">
+  N.A.P SMART FARMING RC · Browser UI Demo
+</footer>
+
+<script>
+const logBox = document.getElementById("log");
+const statusText = document.getElementById("status");
+const demoBtn = document.getElementById("demoBtn");
+let demoStarted = false;
+
+function logCommand(command, description) {
+  const time = new Date().toLocaleTimeString();
+  logBox.textContent +=
+    "\n[" + time + "] " + description + " | Command: " + command;
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+demoBtn.addEventListener("click", () => {
+  demoStarted = !demoStarted;
+  statusText.textContent = demoStarted
+    ? "BROWSER DEMO ACTIVE"
+    : "BROWSER DEMO MODE";
+  demoBtn.textContent = demoStarted
+    ? "STOP BROWSER DEMO"
+    : "START BROWSER DEMO";
+  logCommand("-", demoStarted
+    ? "Demo started (no Bluetooth connection)"
+    : "Demo stopped");
+});
+
+function sendDemoCommand(command, description) {
+  if (!demoStarted) {
+    logCommand("-", "Start the browser demo first");
+    return;
+  }
+  logCommand(command, description);
+}
+
+document.querySelectorAll("[data-drive]").forEach(button => {
+  const command = button.dataset.drive;
+  let pressed = false;
+
+  function startDrive(event) {
+    if (event) event.preventDefault();
+    if (pressed) return;
+    pressed = true;
+    sendDemoCommand(command, "Drive command preview");
+  }
+
+  function stopDrive(event) {
+    if (event) event.preventDefault();
+    if (!pressed) return;
+    pressed = false;
+    sendDemoCommand("S", "Direction released — stop preview");
+  }
+
+  button.addEventListener("pointerdown", startDrive);
+  button.addEventListener("pointerup", stopDrive);
+  button.addEventListener("pointercancel", stopDrive);
+  button.addEventListener("lostpointercapture", stopDrive);
+  button.addEventListener("contextmenu", e => e.preventDefault());
+});
+
+document.getElementById("stopBtn").addEventListener("click", () => {
+  sendDemoCommand("S", "Emergency stop preview");
+});
+
+document.querySelectorAll("[data-command]").forEach(button => {
+  button.addEventListener("click", () => {
+    const command = button.dataset.command;
+    sendDemoCommand(command, button.textContent.trim());
+  });
+});
+
+document.getElementById("speed").addEventListener("input", event => {
+  document.getElementById("speedValue").textContent =
+    event.target.value + "%";
+});
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  logBox.textContent = "Log cleared.";
+});
+</script>
+</body>
+</html>
